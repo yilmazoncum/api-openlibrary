@@ -3,6 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mongoose = require('mongoose');
+var debug = require('debug')('api-openlibrary:server');
+require('dotenv').config()
 
 var indexRouter = require('./routes/index');
 var isbnRouter = require('./routes/isbn');
@@ -19,6 +22,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// db connection
+mongoose.connect(`mongodb+srv://pionero:${process.env.DB_PASSWORD}@cluster0.wjesh.mongodb.net/?retryWrites=true&w=majority`, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	})
+	.then(() => debug("Database Connected"))
+	.catch((err) => debug(err));
 
 app.use('/', indexRouter);
 app.use('/isbn', isbnRouter);
